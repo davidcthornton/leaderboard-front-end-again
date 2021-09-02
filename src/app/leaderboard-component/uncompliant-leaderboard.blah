@@ -1,0 +1,103 @@
+import { Component, OnInit } from '@angular/core';
+import * as Highcharts from 'highcharts';
+import { LMSService } from '../lms.service';
+import { Student } from '../student';
+
+@Component({
+  selector: 'app-leaderboard-component',
+  templateUrl: './leaderboard-component.component.html',
+  styleUrls: ['./leaderboard-component.component.css']
+})
+
+export class LeaderboardComponentComponent implements OnInit {
+	
+	students: Array<Student>;
+	studentNames: Array<string> = [];
+	studentGrades: Array<number> = [];
+
+	daveChart: typeof Highcharts = Highcharts;
+	updateFlag = false;
+	chartOptions: Highcharts.Options = {
+		chart: {
+				renderTo: 'leaderboardBlockChartContainer',
+				type: 'bar',				
+				/*height: 400,
+				marginBottom: 110*/
+			},
+			series: [{
+				name: 'XP',
+				data: [],
+				/*color: "#aaaaaa"*/
+			}],
+			
+			credits: {
+				enabled: false
+			},
+			tooltip: {
+				formatter: function() {
+					return this.y;
+				}
+			},
+			yAxis: {
+				title: {
+					text: null
+				},
+				gridLineWidth: 0,
+				labels: {
+					enabled: false
+				},
+				/*offset: 20,
+				labels: {
+					rotation: -45
+				}*/
+			},
+			xAxis: {										
+				categories: [],
+				title: {
+					text: null
+				}
+			},
+			legend: {  enabled: false  },  
+			title: {
+				text: null
+			},			
+			plotOptions: {
+			   series: {
+				pointPadding: 0,
+				groupPadding: 0.1,
+				   borderWidth: 0,
+				   borderColor: 'gray',
+				   shadow: false
+			   }
+		   },
+	};
+	
+	constructor(private lmsService: LMSService) {}
+	
+	getStudentGrades(): void {
+		this.lmsService.getStudentGradesFromLocalhost()
+		//this.lmsService.getStudentGradesFromHeroku()
+		
+			.subscribe(thestudents => 
+			{				
+				this.students = thestudents;
+				this.students.sort((a, b) => (a.grade < b.grade) ? 1 : -1)
+				this.studentNames = [];
+				this.studentGrades = [];
+				for (let student of this.students) {
+					this.studentNames.push(student.name);
+					this.studentGrades.push(student.grade);
+				}
+				this.updateChart(this.studentNames, this.studentGrades);				
+			});			
+	}
+	updateChart(labels, values): void {		
+		this.daveChart.charts[0].xAxis[0].setCategories(labels);					
+		this.daveChart.charts[0].series[0].setData(values, true, true);
+	}
+	
+	ngOnInit() {	
+		this.getStudentGrades();
+	}			
+
+}

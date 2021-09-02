@@ -1,0 +1,22 @@
+
+<!--
+{{students | json}}
+
+
+<ul >
+
+  <li *ngFor="let student of students" >
+    <span >{{student.name}} - {{student.grade}} </span> 
+  </li>
+</ul>
+-->
+<div class="example-box">
+
+<highcharts-chart 
+  [Highcharts]="daveChart"
+  [options]="chartOptions" 
+	style="width: 100%; height: 400px; display: block;"
+>
+</highcharts-chart>
+
+</div>
